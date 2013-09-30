@@ -1,22 +1,34 @@
-We introduce a new StructuredClone operator. (Need to inline transferMap semantics from postMessage() to complete this.)
+# Overview
 
-Transferable objects carry a [[Transferable]] internal data property that is either undefined or “neutered”.
+We introduce a StructuredClone operator.
+
+Transferable objects carry a [[Transfer]] internal data property that is either a transfer operator or "neutered".
 
 Objects defined outside ECMAScript need to define a [[Clone]] internal data property that returns a copy of the object and a new value for the deepClone variable.
 
 The first iteration is not user-pluggable. It is about moving the semantics into ECMAScript proper and tying them down.
 
 
-# StructuredClone(input, transferMap)
+# Note
+
+The algorithms below combine http://www.whatwg.org/specs/web-apps/current-work/#dom-messageport-postmessage and http://www.whatwg.org/specs/web-apps/current-work/#structured-clone as they really belong together.
+
+
+# StructuredClone(input, transferList)
 
 The operator StructuredClone either returns a structured clone of input or throws an exception.
 
-1. Let memory be an association list of pairs of objects, initially empty.
-This is used to handle duplicate references.
-1. In each pair of objects, one is called the source object and the other the destination object.
-For each mapping in transferMap, add a mapping from the Transferable object (the source object) 
-to the placeholder object (the destination object) to memory.
-1. Return InternalStructuredClone(input, memory)
+1. Let memory be a map of source-to-destination object mappings. 
+
+1. For each object transferable in transferList:
+    1. If transferable does not have a [[Transfer]] internal data property whose value is an operator, throw ...
+    1. Append a mapping from transferable to a new unique placeholder object in memory.
+1. Let clone be the result of InternalStructuredClone(input, memory). Re-raise any exceptions.
+1. For each object transferable in transferList:
+    1. Let transfered be the result of invoking [[Transfer]] on transferable.
+    1. Replace the object transferable in memory maps to with transfered.
+
+XXX: We should be clearer about realms here I suppose.
 
 # InternalStructuredClone(input, memory)
 
