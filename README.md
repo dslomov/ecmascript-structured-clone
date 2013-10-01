@@ -34,7 +34,8 @@ The operator StructuredClone either returns a _structured clone_ of _input_ or t
 A _structured clone_ of an object _input_ is an object in code realm _targetRealm_.
 
 
-1. Let memory be a map of source-to-destination object mappings. 
+1. Let memory be a map of source-to-destination object mappings. Destination objects are always objects
+   of _targetRealm_.
 
 1. For each object transferable in transferList:
     1. If transferable does not have a [[Transfer]] internal data property whose value is an operator, throw ...
@@ -53,11 +54,14 @@ or throws an exception.
 1. If input.[[Transferable]] is “neutered”, throw ...
 1. If input is a primitive value, return input.
 1. Let deepClone be false.
-1. If input.[[BooleanData]] exists, return a new Boolean object whose [[BooleanData]] is input.[[BooleanData]].
-1. If input.[[NumberData]] exists, ...
-1. If input.[[StringData]] exists, ...
-1. If input.[[DateValue]] exists, ...
-1. If input.[[RegExpMatcher]] exists, ... also copy [[OriginalSource]] and [[OriginalFlags]].
+1. If input.[[BooleanData]] exists, return a new Boolean object in _targetRealm_ whose [[BooleanData]] is input.[[BooleanData]].
+1. If input.[[NumberData]] exists, return a new Number object in _targetRealm_ whose [[NumberData]] is input.[[NumberData]] 
+1. If input.[[StringData]] exists, return a new String object in _targetRealm_ whose [[StringData]] is input.[[StringData]].
+1. If input.[[DateValue]] exists, return a new Date object in _targetRealm_ whose [[DateValue]] is input.[[DateValue]].
+1. If input.[[RegExpMatcher]] exists, return a new RegExp object _r_ in _targetRealm_ such that: 
+    * r.[[RegExpMatcher]] is input.[[RegExpMatcher]]
+    * r.[[OriginalSource]] is input.[[OriginalSource]]
+    * r.[[OriginalFlags]] is input.[[OriginalFlags]].
 1. If input.[[ArrayBufferData]] exists, ...
 1. If input.[[MapData]] exists, ...
 1. If input.[[SetData]] exists, ...
