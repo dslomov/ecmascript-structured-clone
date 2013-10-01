@@ -1,38 +1,55 @@
-# Overview
+# Structured cloning and transfer
+## Overview
+
+Structured cloning algorithm defines the semantics of copying a well-defined subset of ECMAScript 
+objects between Code Realms. This algorithm is extensible by host enviroment to support cloning of host objects.
+
+Optionally, some kinds of objects may support a "transfer" operation, the effect of which is to transfer 
+"ownership" of some resource associated with an object to a different code realm. 
+The object then becomes unusable in source realm. 
+
+----
+
+This specification combines and subsumes http://www.whatwg.org/specs/web-apps/current-work/#dom-messageport-postmessage and 
+http://www.whatwg.org/specs/web-apps/current-work/#structured-clone as they really belong together.
+
+HTML spec will refer to this definition for specification of _Structured Clone_ algorithm.
+
+----
 
 We introduce a StructuredClone operator.
 
 Transferable objects carry a [[Transfer]] internal data property that is either a transfer operator or "neutered".
 
-Objects defined outside ECMAScript need to define a [[Clone]] internal data property that returns a copy of the object and a new value for the deepClone variable.
+Objects defined outside ECMAScript need to define a [[Clone]] internal data property that returns a copy of the 
+object and a new value for the deepClone variable.
 
-The first iteration is not user-pluggable. It is about moving the semantics into ECMAScript proper and tying them down.
-
-
-# Note
-
-The algorithms below combine http://www.whatwg.org/specs/web-apps/current-work/#dom-messageport-postmessage and http://www.whatwg.org/specs/web-apps/current-work/#structured-clone as they really belong together.
+Note: _The first iteration is not user-pluggable. It is about moving the semantics into ECMAScript
+proper and tying them down._
 
 
-# StructuredClone(input, transferList)
+## StructuredClone(input, transferList, targetRealm)
 
-The operator StructuredClone either returns a structured clone of input or throws an exception.
+The operator StructuredClone either returns a _structured clone_ of _input_ or throws an exception.
+A _structured clone_ of an object _input_ is an object in code realm _targetRealm_
+
 
 1. Let memory be a map of source-to-destination object mappings. 
 
 1. For each object transferable in transferList:
     1. If transferable does not have a [[Transfer]] internal data property whose value is an operator, throw ...
     1. Append a mapping from transferable to a new unique placeholder object in memory.
-1. Let clone be the result of InternalStructuredClone(input, memory). Re-raise any exceptions.
+1. Let clone be the result of InternalStructuredClone(input, memory, targetRealm). Re-raise any exceptions.
 1. For each object transferable in transferList:
     1. Let transfered be the result of invoking [[Transfer]] on transferable.
     1. Replace the object transferable in memory maps to with transfered.
 
 XXX: We should be clearer about realms here I suppose.
 
-# InternalStructuredClone(input, memory)
+## InternalStructuredClone(input, memory, targetRealm)
 
-The operator StructuredClone either returns a structured clone of input or throws an exception.
+The operator InternalStructuredClone either returns a _structured clone_ of _input_ in code realm _targetRealm_
+or throws an exception.
 
 1. If input is the source object of a pair of objects in memory, then return the destination object in that pair of objects.
 1. If input.[[Transferable]] is “neutered”, throw ...
