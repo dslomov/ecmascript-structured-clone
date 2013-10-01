@@ -5,15 +5,15 @@ Structured cloning algorithm defines the semantics of copying a well-defined sub
 objects between Code Realms. This algorithm is extensible by host enviroment to support cloning of host objects.
 
 Optionally, some kinds of objects may support a "transfer" operation, the effect of which is to transfer 
-"ownership" of some resource associated with an object to a different code realm. 
-The object then becomes unusable in source realm. 
+"ownership" of some resource associated with an object to a different Code Realm. 
+The object then becomes unusable in the source Code Realm. 
 
 ----
 
 This specification combines and subsumes http://www.whatwg.org/specs/web-apps/current-work/#dom-messageport-postmessage and 
 http://www.whatwg.org/specs/web-apps/current-work/#structured-clone as they really belong together.
 
-HTML spec will refer to this definition for specification of _Structured Clone_ algorithm.
+HTML spec will be updated to refer to this specification of the _StructuredClone_ algorithm.
 
 ----
 
@@ -31,18 +31,16 @@ proper and tying them down._
 ## StructuredClone(input, transferList, targetRealm)
 
 The operator StructuredClone either returns a _structured clone_ of _input_ or throws an exception.
-A _structured clone_ of an object _input_ is an object in code realm _targetRealm_.
-
+A _structured clone_ of an object _input_ is an object in Code Realm _targetRealm_.
 
 1. Let memory be a map of source-to-destination object mappings. Destination objects are always objects
    of _targetRealm_.
-
 1. For each object transferable in transferList:
     1. If transferable does not have a [[Transfer]] internal data property whose value is an operator, throw ...
     1. Append a mapping from transferable to a new unique placeholder object in memory.
 1. Let clone be the result of InternalStructuredClone(input, memory, targetRealm). Re-raise any exceptions.
 1. For each object transferable in transferList:
-    1. Let transfered be the result of invoking [[Transfer]](targetRealm) on transferable.
+    1. Let transfered be the result of invoking transferable.[[Transfer]]\(targetRealm).
     1. Replace the object transferable in memory maps to with transfered.
 
 ## InternalStructuredClone(input, memory, targetRealm)
