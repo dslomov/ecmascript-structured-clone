@@ -54,8 +54,10 @@ or throws an exception.
 1. If input.[[Transferable]] is “neutered”, throw ...
 1. If input is a primitive value, return input.
 1. Let deepClone be false.
-1. If input.[[BooleanData]] exists, return a new Boolean object in _targetRealm_ whose [[BooleanData]] is input.[[BooleanData]].
-1. If input.[[NumberData]] exists, return a new Number object in _targetRealm_ whose [[NumberData]] is input.[[NumberData]] 
+1. If input.[[BooleanData]] exists, 
+      return a new Boolean object in _targetRealm_ whose [[BooleanData]] is input.[[BooleanData]].
+1. If input.[[NumberData]] exists, 
+      return a new Number object in _targetRealm_ whose [[NumberData]] is input.[[NumberData]] 
 1. If input.[[StringData]] exists, return a new String object in _targetRealm_ whose [[StringData]] is input.[[StringData]].
 1. If input.[[DateValue]] exists, return a new Date object in _targetRealm_ whose [[DateValue]] is input.[[DateValue]].
 1. If input.[[RegExpMatcher]] exists, return a new RegExp object _r_ in _targetRealm_ such that: 
@@ -65,14 +67,26 @@ or throws an exception.
 1. If input.[[ArrayBufferData]] exists, ...
 1. If input.[[MapData]] exists, ...
 1. If input.[[SetData]] exists, ...
-1. If input.[[ArrayInitialisationState]] exists, ... and set deepClone to true.
-1. Otherwise, if XXX how to check for Object but not Function or Error?
+1. If input is an exotic Array object:
+    1. Let _object_ a new Array in _targetRealm_
+    2. Set _object_.lenght to _input_.length.
+    3. Set _deepClone_ to true
+1. Otherwise, if IsCallable( _input_ ), throw ....
+1. Otherwise, if input.[[ErrorData]] exists, throw...
 1. Otherwise, if input.[[Clone]] exists, ...
-1. Otherwise, throw ...
-1. Add a mapping from input (the source object) to output (the destination object) to memory.
-1. If deepClone is true, then, for each enumerable own property in input, run the following steps:
-    1. Let name be the name of the property.
-    1. Let sourceValue be the result of calling the [[Get]] internal method of input with the argument name. If the [[Get]] internal method of a property involved executing script, and that script threw an uncaught exception, then abort the overall structured clone algorithm, with that exception being passed through to the caller.
-1. Let clonedValue be the result of InternalStructuredClone(sourceValue, memory). If this results in an exception, then abort the overall structured clone algorithm, with that exception being passed through to the caller.
-1. Add a new property to output having the name name, and having the value clonedValue.
-1. Return output.
+1. Otherwise, if input is a host object, throw ...
+1. Otherwise: 
+    1. Let _object_ be a new Object in _targetRealm_.
+    1. set _deepClone_ to true.
+2. Add a mapping from _input_ (the source object) to _output_ (the destination object) to _memory_.
+3. If _deepClone_ is true:
+   1. Let _keys_ be _input_.\[\[OwnPropertyKeys]]\().
+   2. For each _key_ in _keys_:
+      1. If _key_ is a primitive String value, set _outputKey_ to _key_
+      2. TODO: Symbols
+      1. Let sourceValue be input.\[\[Get]]\( _key_, _input_)
+      2. ReturnIfAbrupt( _sourceValue_ )
+      3. Let clonedValue be InternalStructuredClone(sourceValue, memory). 
+      4. ReturnIfAbrupt( _clonedValue_ )
+      5. output.\[\[Set]]\( _outputKey_, _clonedValue_, _output_)
+1. Return _output_.
