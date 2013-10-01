@@ -28,7 +28,7 @@ Note: _The first iteration is not user-pluggable. It is about moving the semanti
 proper and tying them down._
 
 
-## StructuredClone(_input_, _transferList_, _targetRealm_)
+## StructuredClone(input, transferList, targetRealm)
 
 The operator StructuredClone either returns a _structured clone_ of _input_ or throws an exception.
 A _structured clone_ of an object _input_ is an object in Code Realm _targetRealm_.
@@ -37,13 +37,13 @@ A _structured clone_ of an object _input_ is an object in Code Realm _targetReal
 1. For each object _transferable_ in _transferList_:
     1. If _transferable_ does not have a [[Transfer]] internal data property whose value is an operator, throw ...
     1. Append a mapping from _transferable_ to a new unique placeholder object for _targetRealm_ in _memory_.
-1. Let _clone_ be the result of InternalStructuredClone(_input_, _memory_, _targetRealm_).
-1. ReturnIfAbrupt(_clone_).
+1. Let _clone_ be the result of InternalStructuredClone( _input_, _memory_, _targetRealm_).
+1. ReturnIfAbrupt( _clone_).
 1. For each object _transferable_ in _transferList_:
-    1. Let _transfered_ be the result of invoking _transferable_.[[Transfer]]\(_targetRealm_).
+    1. Let _transfered_ be the result of invoking _transferable_.[[Transfer]]\( _targetRealm_).
     1. Replace the object _transferable_ in _memory_ maps to with _transfered_.
 
-## InternalStructuredClone(_input_, _memory_, _targetRealm_)
+## InternalStructuredClone(input, memory, targetRealm)
 
 The operator InternalStructuredClone either returns a _structured clone_ of _input_ in Code Realm _targetRealm_
 or throws an exception.
@@ -69,7 +69,7 @@ or throws an exception.
     1. Let _object_ a new Array in _targetRealm_.
     1. Set _object_.lenght to _input_.length.
     1. Set _deepClone_ to true.
-1. Otherwise, if IsCallable(_input_), throw ....
+1. Otherwise, if IsCallable( _input_), throw ....
 1. Otherwise, if input.[[ErrorData]] exists, throw...
 1. Otherwise, if input.[[Clone]] exists, ...
 1. Otherwise, if input is a host object (what kind of check is this? is this something IDL defines?), throw ...
@@ -82,9 +82,10 @@ or throws an exception.
    1. For each _key_ in _keys_:
       1. If _key_ is a primitive String value, set _outputKey_ to _key_
       1. TODO: Symbols
-      1. Let _sourceValue_ be _input_.[[Get]]\(_key_, _input_).
-      1. ReturnIfAbrupt(_sourceValue_).
-      1. Let _clonedValue_ be InternalStructuredClone(_sourceValue_, _memory_). 
-      1. ReturnIfAbrupt(_clonedValue_).
-      1. output.[[Set]]\( _outputKey_, _clonedValue_, _output_).
+      1. Let _sourceValue_ be _input_.[[Get]]\( _key_, _input_).
+      1. ReturnIfAbrupt( _sourceValue_).
+      1. Let _clonedValue_ be InternalStructuredClone( _sourceValue_, _memory_). 
+      1. ReturnIfAbrupt( _clonedValue_).
+      1. Let _outputSet_ be _output_.[[Set]]\( _outputKey_, _clonedValue_, _output_).
+      1. ReturnIfAbrupt( _outputSet_ )
 1. Return _output_.
