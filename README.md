@@ -31,7 +31,7 @@ proper and tying them down._
 ## StructuredClone(input, transferList, targetRealm)
 
 The operator StructuredClone either returns a _structured clone_ of _input_ or throws an exception.
-A _structured clone_ of an object _input_ is an object in code realm _targetRealm_
+A _structured clone_ of an object _input_ is an object in code realm _targetRealm_.
 
 
 1. Let memory be a map of source-to-destination object mappings. 
@@ -41,10 +41,8 @@ A _structured clone_ of an object _input_ is an object in code realm _targetReal
     1. Append a mapping from transferable to a new unique placeholder object in memory.
 1. Let clone be the result of InternalStructuredClone(input, memory, targetRealm). Re-raise any exceptions.
 1. For each object transferable in transferList:
-    1. Let transfered be the result of invoking [[Transfer]] on transferable.
+    1. Let transfered be the result of invoking [[Transfer]](targetRealm) on transferable.
     1. Replace the object transferable in memory maps to with transfered.
-
-XXX: We should be clearer about realms here I suppose.
 
 ## InternalStructuredClone(input, memory, targetRealm)
 
