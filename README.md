@@ -41,6 +41,9 @@ A _structured clone_ of an object _input_ is an object in Code Realm _targetReal
     2. ReturnIfAbrupt( _transferResult_ )
     1. Append a mapping from _transferable_ to _transferResult_ to _memory_.
 1. Let _clone_ be the result of InternalStructuredClone( _input_, _memory_, _targetRealm_ ).
+1. ReturnIfAbrupt( _clone_ ).
+1. For each object _transferable_ in _transferList_:
+    1. Run _transferable_.\[\[OnSuccessfulTransfer\]\]\()
 1. Return _clone_.
 
 
@@ -91,17 +94,22 @@ or throws an exception.
       1. ReturnIfAbrupt( _outputSet_ )
 1. Return _output_.
 
-## Definition of \[\[Transfer]](targetRealm) on ECMAScript exotic objects.
+## Definition of \[\[Transfer]]\(targetRealm) on ECMAScript exotic objects.
 
 Definition of _object_.\[[Transfer]]\( _targetRealm_ ):
 
 1. If _object_ has an [[ArrayBufferData]] internal data property then:
     1. Let _transferResult_ be a new ArrayBuffer in Code Realm _targetRealm_
     1. TODO: set byte lenght of _transferResult_ to byte lenght og _object_ and copy data block.
+
+## Definition of \[\[OnSuccessfulTransfer]]\() on ECMAScript exotic objects.
+
+Definition of _object_.\[[OnSuccessfulTransfer]]\( _targetRealm_ ):
+
+1. If _object_ has an [[ArrayBufferData]] internal data property then:
     1. Let _neuteringResult_ be SetArrayBufferData( _object_, 0 ).
     1. ReturnIfAbrupt( _neuteringResult_ ).
     1. Set _object_.\[[Transfer]] to "neutered".
-    1. Return _transferResult_.
 
 ## DataCloneError error object
 
