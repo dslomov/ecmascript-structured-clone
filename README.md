@@ -95,3 +95,5 @@ or throws an exception.
 
 Indicates failure of the structured clone algorithm.
 
+{Rationale: typically, ECMAScript operations throw RangeError for similar failures, 
+but we need to preserve DOM compatibnility}
