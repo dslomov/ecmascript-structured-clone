@@ -35,7 +35,8 @@ A _structured clone_ of an object _input_ is an object in Code Realm _targetReal
 
 1. Let _memory_ be a map of source-to-destination object mappings.
 1. For each object _transferable_ in _transferList_:
-    1. If _transferable_ does not have a [[Transfer]] internal data property whose value is an operator, throw ...
+    1. If _transferable_ does not have a [[Transfer]] internal data property whose value is an operator, 
+       throw a DataCloneError exception.
     1. Append a mapping from _transferable_ to a new unique placeholder object for _targetRealm_ in _memory_.
 1. Let _clone_ be the result of InternalStructuredClone( _input_, _memory_, _targetRealm_).
 1. ReturnIfAbrupt( _clone_).
@@ -49,7 +50,7 @@ The operator InternalStructuredClone either returns a _structured clone_ of _inp
 or throws an exception.
 
 1. If _input_ is the source object of a pair of objects in _memory_, then return the destination object in that pair of objects.
-1. If _input_.[[Transferable]] is “neutered”, throw ...
+1. If _input_.[[Transferable]] is “neutered”, throw a DataCloneError exception.
 1. If _input_ is a primitive value, return _input_.
 1. Let _deepClone_ be false.
 1. If _input_.[[BooleanData]] exists, 
@@ -69,10 +70,10 @@ or throws an exception.
     1. Let _object_ be a new Array in _targetRealm_.
     1. Set _object_.length to _input_.length.
     1. Set _deepClone_ to true.
-1. Otherwise, if IsCallable( _input_), throw ....
-1. Otherwise, if input.[[ErrorData]] exists, throw...
-1. Otherwise, if input.[[Clone]] exists, ...
-1. Otherwise, if input is an exotic object, throw ...
+1. Otherwise, if IsCallable( _input_), throw a DataCloneError exception.
+1. Otherwise, if input.[[ErrorData]] exists, throw a DataCloneError exception.
+1. Otherwise, if input.[[Clone]] exists, throw a DataCloneError exception.
+1. Otherwise, if input is an exotic object, throw a DataCloneError exception.
 1. Otherwise: 
     1. Let _object_ be a new Object in _targetRealm_.
     1. set _deepClone_ to true.
@@ -89,3 +90,8 @@ or throws an exception.
       1. Let _outputSet_ be _output_.[[Set]]\( _outputKey_, _clonedValue_, _output_).
       1. ReturnIfAbrupt( _outputSet_ )
 1. Return _output_.
+
+## DataCloneError error object
+
+Indicates failure of the structured clone algorithm.
+
