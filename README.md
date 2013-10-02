@@ -100,7 +100,7 @@ Definition of _object_.\[[Transfer]]\( _targetRealm_ ):
 
 1. If _object_ has an [[ArrayBufferData]] internal data property then:
     1. Let _transferResult_ be a new ArrayBuffer in Code Realm _targetRealm_
-    1. TODO: set byte lenght of _transferResult_ to byte lenght og _object_ and copy data block.
+    1. TODO: set byte length of _transferResult_ to byte length of _object_ and copy data block.
 
 ## Definition of \[\[OnSuccessfulTransfer]]\() on ECMAScript exotic objects.
 
