@@ -19,10 +19,14 @@ HTML spec will be updated to refer to this specification of the _StructuredClone
 
 We introduce a StructuredClone operator.
 
-Transferable objects carry a [[Transfer]] internal data property that is either a transfer operator or "neutered".
+Transferable objects carry a [[Transfer]] internal data property that is either a transfer operator or "neutered", 
+and an [[OnSuccessfulTransfer]] internal method.
 
-Objects defined outside ECMAScript need to define a [[Clone]] internal data property that returns a copy of the 
-object and a new value for the deepClone variable.
+Objects defined outside ECMAScript need to define a [[Clone]] internal method that returns a copy of the 
+object and a new value for the deepClone variable. 
+
+{TODO: why we need a new value of deepClone? 
+As specced below, return value of [[Clone]] is a return value of the whole algorithm}
 
 Note: _The first iteration is not user-pluggable. It is about moving the semantics into ECMAScript
 proper and tying them down._
@@ -43,7 +47,9 @@ A _structured clone_ of an object _input_ is an object in Code Realm _targetReal
 1. Let _clone_ be the result of InternalStructuredClone( _input_, _memory_, _targetRealm_ ).
 1. ReturnIfAbrupt( _clone_ ).
 1. For each object _transferable_ in _transferList_:
-    1. Run _transferable_.\[\[OnSuccessfulTransfer\]\]\()
+    1. Run _transferable_.\[\[OnSuccessfulTransfer\]\]\() 
+    {TODO: Anne, does this look good to you? I like it because there's no need to carry
+     transferList around in the guts of StructuredClone and no "placeholder objects" hands-waving}
 1. Return _clone_.
 
 
