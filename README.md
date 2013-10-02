@@ -37,12 +37,12 @@ A _structured clone_ of an object _input_ is an object in Code Realm _targetReal
 1. For each object _transferable_ in _transferList_:
     1. If _transferable_ does not have a [[Transfer]] internal data property whose value is an operator, 
        throw a DataCloneError exception.
-    1. Append a mapping from _transferable_ to a new unique placeholder object for _targetRealm_ in _memory_.
-1. Let _clone_ be the result of InternalStructuredClone( _input_, _memory_, _targetRealm_).
-1. ReturnIfAbrupt( _clone_).
-1. For each object _transferable_ in _transferList_:
-    1. Let _transfered_ be the result of invoking _transferable_.[[Transfer]]\( _targetRealm_).
-    1. Replace the object _transferable_ in _memory_ maps to with _transfered_.
+    1. Let _transferResult_ be _transferable_.\[[Transfer]]\( _targetRealm_ ).
+    2. ReturnIfAbrupt( _transferResult_ )
+    1. Append a mapping from _transferable_ to _transferResult_ to _memory_.
+1. Let _clone_ be the result of InternalStructuredClone( _input_, _memory_, _targetRealm_ ).
+1. Return _clone_.
+
 
 ## InternalStructuredClone(input, memory, targetRealm)
 
@@ -50,7 +50,7 @@ The operator InternalStructuredClone either returns a _structured clone_ of _inp
 or throws an exception.
 
 1. If _input_ is the source object of a pair of objects in _memory_, then return the destination object in that pair of objects.
-1. If _input_.[[Transferable]] is “neutered”, throw a DataCloneError exception.
+1. If _input_.[[Transfer]] is “neutered”, throw a DataCloneError exception.
 1. If _input_ is a primitive value, return _input_.
 1. Let _deepClone_ be false.
 1. If _input_.[[BooleanData]] exists, 
@@ -72,7 +72,7 @@ or throws an exception.
     1. Set _deepClone_ to true.
 1. Otherwise, if IsCallable( _input_), throw a DataCloneError exception.
 1. Otherwise, if input.[[ErrorData]] exists, throw a DataCloneError exception.
-1. Otherwise, if input.[[Clone]] exists, throw a DataCloneError exception.
+1. Otherwise, if input.[[Clone]] exists, return a result of input.\[[Clone]]( _targetRealm_ ) {TODO: needs memory as well?}
 1. Otherwise, if input is an exotic object, throw a DataCloneError exception.
 1. Otherwise: 
     1. Let _object_ be a new Object in _targetRealm_.
@@ -90,6 +90,18 @@ or throws an exception.
       1. Let _outputSet_ be _output_.[[Set]]\( _outputKey_, _clonedValue_, _output_).
       1. ReturnIfAbrupt( _outputSet_ )
 1. Return _output_.
+
+## Definition of \[\[Transfer]](targetRealm) on ECMAScript exotic objects.
+
+Definition of _object_.\[[Transfer]]\( _targetRealm_ ):
+
+1. If _object_ has an [[ArrayBufferData]] internal data property then:
+    1. Let _transferResult_ be a new ArrayBuffer in Code Realm _targetRealm_
+    1. TODO: set byte lenght of _transferResult_ to byte lenght og _object_ and copy data block.
+    1. Let _neuteringResult_ be SetArrayBufferData( _object_, 0 ).
+    1. ReturnIfAbrupt( _neuteringResult_ ).
+    1. Set _object_.\[[Transfer]] to "neutered".
+    1. Return _transferResult_.
 
 ## DataCloneError error object
 
