@@ -23,10 +23,7 @@ Transferable objects carry a [[Transfer]] internal data property that is either 
 and an [[OnSuccessfulTransfer]] internal method.
 
 Objects defined outside ECMAScript need to define a [[Clone]] internal method that returns a copy of the 
-object and a new value for the deepClone variable. 
-
-{TODO: why we need a new value of deepClone? 
-As specced below, return value of [[Clone]] is a return value of the whole algorithm}
+object.
 
 Note: _The first iteration is not user-pluggable. It is about moving the semantics into ECMAScript
 proper and tying them down._
