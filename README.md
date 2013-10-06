@@ -47,9 +47,8 @@ A _structured clone_ of an object _input_ is an object in Code Realm _targetReal
 1. Let _clone_ be the result of InternalStructuredClone( _input_, _memory_, _targetRealm_ ).
 1. ReturnIfAbrupt( _clone_ ).
 1. For each object _transferable_ in _transferList_:
-    1. Run _transferable_.\[\[OnSuccessfulTransfer\]\]\() 
-    {TODO: Anne, does this look good to you? I like it because there's no need to carry
-     transferList around in the guts of StructuredClone and no "placeholder objects" hands-waving}
+    1. Let _transferResult_ be a target of mapping from _transferable_ in _memory_.  
+    1. Run _transferable_.\[\[OnSuccessfulTransfer\]\]\(_transferResult_).
 1. Return _clone_.
 
 
