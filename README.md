@@ -38,14 +38,15 @@ A _structured clone_ of an object _input_ is an object in Code Realm _targetReal
 1. For each object _transferable_ in _transferList_:
     1. If _transferable_ does not have a [[Transfer]] internal data property whose value is an operator, 
        throw a DataCloneError exception.
-    1. Let _transferResult_ be _transferable_.\[[Transfer]]\( _targetRealm_ ).
+    1. Let _transferResult_ be a result of a call to a _transferable_'s internal method 
+        \[[Transfer]] with argument _targetRealm_.
     2. ReturnIfAbrupt( _transferResult_ )
     1. Append a mapping from _transferable_ to _transferResult_ to _memory_.
 1. Let _clone_ be the result of InternalStructuredClone( _input_, _memory_, _targetRealm_ ).
 1. ReturnIfAbrupt( _clone_ ).
 1. For each object _transferable_ in _transferList_:
     1. Let _transferResult_ be a target of mapping from _transferable_ in _memory_.  
-    1. Run _transferable_.\[\[OnSuccessfulTransfer\]\]\(_transferResult_).
+    1. Run _transferable_'s internal method \[\[OnSuccessfulTransfer\]\]\(_transferResult_).
 1. Return _clone_.
 
 
@@ -55,29 +56,29 @@ The operator InternalStructuredClone either returns a _structured clone_ of _inp
 or throws an exception.
 
 1. If _input_ is the source object of a pair of objects in _memory_, then return the destination object in that pair of objects.
-1. If _input_.[[Transfer]] is “neutered”, throw a DataCloneError exception.
+1. If _input_'s [[Transfer]] is “neutered”, throw a DataCloneError exception.
 1. If _input_ is a primitive value, return _input_.
 1. Let _deepClone_ be false.
-1. If _input_.[[BooleanData]] exists, 
-      return a new Boolean object in _targetRealm_ whose [[BooleanData]] is _input_.[[BooleanData]].
-1. If _input_.[[NumberData]] exists, 
-      return a new Number object in _targetRealm_ whose [[NumberData]] is _input_.[[NumberData]] 
-1. If _input_.[[StringData]] exists, return a new String object in _targetRealm_ whose [[StringData]] is _input_.[[StringData]].
-1. If _input_.[[DateValue]] exists, return a new Date object in _targetRealm_ whose [[DateValue]] is _input_.[[DateValue]].
+1. If _input_ has a [[BooleanData]] internal data property, 
+      return a new Boolean object in _targetRealm_ whose [[BooleanData]] is [[BooleanData]] of _input_.
+1. If _input_ has a [[NumberData]] internal data property, 
+      return a new Number object in _targetRealm_ whose [[NumberData]] is [[NumberData]] of _input_.
+1. If _input_ has a [[StringData]] internal data property, return a new String object in _targetRealm_ whose [[StringData]] is [[StringData]] of _input_.
+1. If _input_ has a [[DateValue]] internal data property, return a new Date object in _targetRealm_ whose [[DateValue]] is [[DateValue]] of _input_.
 1. If _input_.[[RegExpMatcher]] exists, return a new RegExp object _r_ in _targetRealm_ such that: 
-    * _r_.[[RegExpMatcher]] is _input_.[[RegExpMatcher]]
-    * _r_.[[OriginalSource]] is _input_.[[OriginalSource]]
-    * _r_.[[OriginalFlags]] is _input_.[[OriginalFlags]].
-1. If _input_.[[ArrayBufferData]] exists, ...
-1. If _input_.[[MapData]] exists, ...
-1. If _input_.[[SetData]] exists, ...
+    * [[RegExpMatcher]] of _r_ is [[RegExpMatcher]] of _input_.
+    * [[OriginalSource]] of _r_ is [[OriginalSource]] of _input_.
+    * [[OriginalFlags]] of _r_ is [[OriginalFlags]] of _input_.
+1. If _input_ has [[ArrayBufferData]] internal data property, ...
+1. If _input_ has [[MapData]] internal data property, ...
+1. If _input_ has [[SetData]] internal data property, ...
 1. If _input_ is an exotic Array object:
     1. Let _object_ be a new Array in _targetRealm_.
     1. Set _object_.length to _input_.length.
     1. Set _deepClone_ to true.
 1. Otherwise, if IsCallable( _input_), throw a DataCloneError exception.
-1. Otherwise, if input.[[ErrorData]] exists, throw a DataCloneError exception.
-1. Otherwise, if input.[[Clone]] exists, return a result of input.\[[Clone]]( _targetRealm_ ) {TODO: needs memory as well?}
+1. Otherwise, if input has [[ErrorData]] propety, throw a DataCloneError exception.
+1. Otherwise, if input has [[Clone]] internal method, return a result of input.\[[Clone]]( _targetRealm_ )
 1. Otherwise, if input is an exotic object, throw a DataCloneError exception.
 1. Otherwise: 
     1. Let _object_ be a new Object in _targetRealm_.
@@ -88,11 +89,11 @@ or throws an exception.
    1. For each _key_ in _keys_:
       1. If _key_ is a primitive String value, set _outputKey_ to _key_
       1. TODO: Symbols
-      1. Let _sourceValue_ be _input_.[[Get]]\( _key_, _input_).
+      1. Let _sourceValue_ be a result of a call to_input_'s internal method [[Get]]\( _key_, _input_).
       1. ReturnIfAbrupt( _sourceValue_).
       1. Let _clonedValue_ be InternalStructuredClone( _sourceValue_, _memory_). 
       1. ReturnIfAbrupt( _clonedValue_).
-      1. Let _outputSet_ be _output_.[[Set]]\( _outputKey_, _clonedValue_, _output_).
+      1. Let _outputSet_ be a result of a call to _output_'s internal method [[Set]]\( _outputKey_, _clonedValue_, _output_).
       1. ReturnIfAbrupt( _outputSet_ )
 1. Return _output_.
 
@@ -106,12 +107,12 @@ Definition of _object_.\[[Transfer]]\( _targetRealm_ ):
 
 ## Definition of \[\[OnSuccessfulTransfer]]\() on ECMAScript exotic objects.
 
-Definition of _object_.\[[OnSuccessfulTransfer]]\( _targetRealm_ ):
+Definition of internal method [[OnSuccessfulTransfer]]\( _targetRealm_ ):
 
 1. If _object_ has an [[ArrayBufferData]] internal data property then:
     1. Let _neuteringResult_ be SetArrayBufferData( _object_, 0 ).
     1. ReturnIfAbrupt( _neuteringResult_ ).
-    1. Set _object_.\[[Transfer]] to "neutered".
+    1. Set value of _object_'s [[Transfer]] internal data property to "neutered".
 
 ## DataCloneError error object
 
