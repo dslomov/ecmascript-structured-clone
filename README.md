@@ -69,7 +69,8 @@ or throws an exception.
     * [[RegExpMatcher]] of _r_ is [[RegExpMatcher]] of _input_.
     * [[OriginalSource]] of _r_ is [[OriginalSource]] of _input_.
     * [[OriginalFlags]] of _r_ is [[OriginalFlags]] of _input_.
-1. If _input_ has [[ArrayBufferData]] internal data property, ...
+1. If _input_ has [[ArrayBufferData]] internal data property:
+    1. Return CopyArrayBufferToRealm\(_input_, _targetRealm_).
 1. If _input_ has [[MapData]] internal data property, ...
 1. If _input_ has [[SetData]] internal data property, ...
 1. If _input_ is an exotic Array object:
@@ -100,10 +101,20 @@ or throws an exception.
 ## Definition of \[\[Transfer]]\(targetRealm) on ECMAScript exotic objects.
 
 Definition of _object_.\[[Transfer]]\( _targetRealm_ ):
-
 1. If _object_ has an [[ArrayBufferData]] internal data property then:
-    1. Let _transferResult_ be a new ArrayBuffer in Code Realm _targetRealm_
-    1. TODO: set byte length of _transferResult_ to byte length of _object_ and copy data block.
+  1. Return CopyArrayBufferToRealm(_object_, _targetRealm_).
+
+
+## Definition of CopyArrayBufferToRealm(_arrayBuffer_, _targetRealm_)
+
+1. Let _result_ be a new ArrayBuffer arrayBuffer in _targetRealm_.
+1. Let _length_ be a value of _arrayBuffer_'s \[\[ArrayBufferByteLength\]\] internal slot.
+1. Let _srcBlock_ be the value of _arrayBuffer_'s \[\[ArrayBufferData\]\] internal slot. 
+1. Let _setStatus_ be a result of SetArrayBufferData(_result_,_length_).
+1. ReturnIfAbrupt(_setStatus_).
+1. Let _targetBlock_ be a value of _result_'s \[\[ArrayBufferData\]\] internal slot.
+1. Perform CopyDataBlock(targetBlock, 0, srcBlock, 0, length).
+1. Return _result_.
 
 ## Definition of \[\[OnSuccessfulTransfer]]\() on ECMAScript exotic objects.
 
