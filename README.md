@@ -101,6 +101,7 @@ or throws an exception.
 ## Definition of \[\[Transfer]]\(targetRealm) on ECMAScript exotic objects.
 
 Definition of _object_.\[[Transfer]]\( _targetRealm_ ):
+
 1. If _object_ has an [[ArrayBufferData]] internal data property then:
   1. Return CopyArrayBufferToRealm(_object_, _targetRealm_).
 
