@@ -59,27 +59,46 @@ or throws an exception.
 1. If _input_'s [[Transfer]] is “neutered”, throw a DataCloneError exception.
 1. If _input_ is a primitive value, return _input_.
 1. Let _deepClone_ be false.
-1. If _input_ has a [[BooleanData]] internal data property, 
-      return a new Boolean object in _targetRealm_ whose [[BooleanData]] is [[BooleanData]] of _input_.
-1. If _input_ has a [[NumberData]] internal data property, 
-      return a new Number object in _targetRealm_ whose [[NumberData]] is [[NumberData]] of _input_.
-1. If _input_ has a [[StringData]] internal data property, return a new String object in _targetRealm_ whose [[StringData]] is [[StringData]] of _input_.
-1. If _input_ has a [[DateValue]] internal data property, return a new Date object in _targetRealm_ whose [[DateValue]] is [[DateValue]] of _input_.
-1. If _input_.[[RegExpMatcher]] exists, return a new RegExp object _r_ in _targetRealm_ such that: 
-    * [[RegExpMatcher]] of _r_ is [[RegExpMatcher]] of _input_.
-    * [[OriginalSource]] of _r_ is [[OriginalSource]] of _input_.
-    * [[OriginalFlags]] of _r_ is [[OriginalFlags]] of _input_.
+1. If _input_ has a [[BooleanData]] internal data property:
+   *  Let _output_ be a new Boolean object in _targetRealm_ whose [[BooleanData]] is [[BooleanData]] of _input_.
+1. If _input_ has a [[NumberData]] internal data property: 
+   *  Let _output_ be a new Number object in _targetRealm_ whose [[NumberData]] is [[NumberData]] of _input_.
+1. If _input_ has a [[StringData]] internal data property: 
+   *  Let _output_ be a new String object in _targetRealm_ whose [[StringData]] is [[StringData]] of _input_.
+1. If _input_ has a [[DateValue]] internal data property:
+    * Let _output_ be a new Date object in _targetRealm_ whose [[DateValue]] is [[DateValue]] of _input_.
+1. If _input_.[[RegExpMatcher]] exists: 
+    * Let _output_ be   new RegExp object _r_ in _targetRealm_ such that: 
+        * [[RegExpMatcher]] of _r_ is [[RegExpMatcher]] of _input_.
+        * [[OriginalSource]] of _r_ is [[OriginalSource]] of _input_.
+        * [[OriginalFlags]] of _r_ is [[OriginalFlags]] of _input_.
 1. If _input_ has [[ArrayBufferData]] internal data property:
-    1. Return CopyArrayBufferToRealm\(_input_, _targetRealm_).
+    1. Set _output_ to CopyArrayBufferToRealm\(_input_, _targetRealm_).
+1. If _input_ has \[\[ViewedArrayBuffer]] internal data property, then:
+    1. let _arrayBuffer_ be a value of _input_'s \[\[ViewedArratBuffer]] internal data property.   
+    1. let _arrayBufferClone_ be InternalStructuredClone\(_arrayBuffer_, _memory_, _targetRealm_)
+    2. ReturnIfAbrupt\(_arrayBufferClone_\)
+    1. if _input_ *instanceof* %DataView% intrinsic object in current realm:
+       1. Let _output_ be an instance of %DataView% intrinsic object in _targetRealm_.
+       1. Set _output_'s \[\[ViewedArrayBuffer\]\] to _arrayBufferClone_.
+       1. Set _output_'s \[\[ByteOffset\]\] to _input_'s \[\[ByteOffset\]\].
+       1. Set _output_'s \[\[ByteLength\]\] to _input_'s \[\[ByteLength\]\].
+    1. Otherwise, if _input_ *instanceof* %_TypedArray_% for one of typed arrays' intrinsics _TypedArray_ in
+       current code realm:
+       1. Let _output_ be an instance of %_TypedArray_% intrinsic object in _targetRealm_.
+       1. Set _output_'s \[\[ByteOffset\]\] to _input_'s \[\[ByteOffset\]\].
+       1. Set _output_'s \[\[ByteLength\]\] to _input_'s \[\[ByteLength\]\].
+       1. Set _output_'s \[\[ArrayLength\]\] to _input_'s \[\[ArrayLength\]\].
 1. If _input_ has [[MapData]] internal data property, ...
 1. If _input_ has [[SetData]] internal data property, ...
 1. If _input_ is an exotic Array object:
-    1. Let _object_ be a new Array in _targetRealm_.
-    1. Set _object_.length to _input_.length.
+    1. Let _output_ be a new Array in _targetRealm_.
+    1. Set _output_.length to _input_.length.
     1. Set _deepClone_ to true.
 1. Otherwise, if IsCallable( _input_), throw a DataCloneError exception.
 1. Otherwise, if input has [[ErrorData]] propety, throw a DataCloneError exception.
-1. Otherwise, if input has [[Clone]] internal method, return a result of input.\[[Clone]]( _targetRealm_ )
+1. Otherwise, if input has [[Clone]] internal method: 
+    1. Set _output_ to a result of input.\[[Clone]]( _targetRealm_ )
 1. Otherwise, if input is an exotic object, throw a DataCloneError exception.
 1. Otherwise: 
     1. Let _object_ be a new Object in _targetRealm_.
@@ -90,7 +109,7 @@ or throws an exception.
    1. For each _key_ in _keys_:
       1. If _key_ is a primitive String value, set _outputKey_ to _key_
       1. TODO: Symbols
-      1. Let _sourceValue_ be a result of a call to_input_'s internal method [[Get]]\( _key_, _input_).
+      1. Let _sourceValue_ be a result of a call to _input_'s internal method [[Get]]\( _key_, _input_).
       1. ReturnIfAbrupt( _sourceValue_).
       1. Let _clonedValue_ be InternalStructuredClone( _sourceValue_, _memory_). 
       1. ReturnIfAbrupt( _clonedValue_).
@@ -108,7 +127,7 @@ Definition of _object_.\[[Transfer]]\( _targetRealm_ ):
 
 ## Definition of CopyArrayBufferToRealm(_arrayBuffer_, _targetRealm_)
 
-1. Let _result_ be a new ArrayBuffer arrayBuffer in _targetRealm_.
+1. Let _result_ be a new ArrayBuffer _arrayBuffer_ in _targetRealm_.
 1. Let _length_ be a value of _arrayBuffer_'s \[\[ArrayBufferByteLength\]\] internal slot.
 1. Let _srcBlock_ be the value of _arrayBuffer_'s \[\[ArrayBufferData\]\] internal slot. 
 1. Let _setStatus_ be a result of SetArrayBufferData(_result_,_length_).
