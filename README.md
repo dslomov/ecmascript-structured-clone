@@ -32,7 +32,7 @@ proper and tying them down._
 ## StructuredClone(input, transferList, targetRealm)
 
 The operator StructuredClone either returns a _structured clone_ of _input_ or throws an exception.
-A _structured clone_ of an object _input_ is an object in Code Realm _targetRealm_.
+A _structured clone_ of an object _input_ is an object in Code Realm _targetRealm_. _transferList_ is a list of objects that should be transferred during cloning of _input_.
 
 1. Let _memory_ be a map of source-to-destination object mappings.
 1. For each object _transferable_ in _transferList_:
@@ -46,7 +46,7 @@ A _structured clone_ of an object _input_ is an object in Code Realm _targetReal
 1. ReturnIfAbrupt( _clone_ ).
 1. For each object _transferable_ in _transferList_:
     1. Let _transferResult_ be a target of mapping from _transferable_ in _memory_.  
-    1. Run _transferable_'s internal method \[\[OnSuccessfulTransfer\]\]\(_transferResult_).
+    1. Run _transferable_'s internal method \[\[OnSuccessfulTransfer\]\]\(_transferResult_, _targetRealm_).
 1. Return _clone_.
 
 
@@ -75,7 +75,7 @@ or throws an exception.
 1. If _input_ has [[ArrayBufferData]] internal data property:
     1. Set _output_ to CopyArrayBufferToRealm\(_input_, _targetRealm_).
 1. If _input_ has \[\[ViewedArrayBuffer]] internal data property, then:
-    1. let _arrayBuffer_ be a value of _input_'s \[\[ViewedArratBuffer]] internal data property.   
+    1. let _arrayBuffer_ be a value of _input_'s \[\[ViewedArrayBuffer]] internal data property.   
     1. let _arrayBufferClone_ be InternalStructuredClone\(_arrayBuffer_, _memory_, _targetRealm_)
     2. ReturnIfAbrupt\(_arrayBufferClone_\)
     1. if _input_ *instanceof* %DataView% intrinsic object in current realm:
@@ -138,7 +138,7 @@ Definition of _object_.\[[Transfer]]\( _targetRealm_ ):
 
 ## Definition of \[\[OnSuccessfulTransfer]]\() on ECMAScript exotic objects.
 
-Definition of internal method [[OnSuccessfulTransfer]]\( _targetRealm_ ):
+Definition of internal method _object_.\[\[OnSuccessfulTransfer]]\( _transferResult_, _targetRealm_ ):
 
 1. If _object_ has an [[ArrayBufferData]] internal data property then:
     1. Let _neuteringResult_ be SetArrayBufferData( _object_, 0 ).
